@@ -1,38 +1,36 @@
-
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
 
-TOKEN = "YOUR_USER_BOT_TOKEN"
+TOKEN = "7501309246:AAGUougXq-AHc48E0D0ChkSLtm6NRMQ2kYg"
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
         [InlineKeyboardButton("🎓 Программы!", callback_data="programs")],
-        [InlineKeyboardButton("📝 Заявка!", callback_data="request")],
-        [InlineKeyboardButton("💬 Задать вопрос!", callback_data="question")]
+        [InlineKeyboardButton("📝 Заявка!", url="https://thenewtwo.netlify.app/study_request_form.html")],
+        [InlineKeyboardButton("💬 Задать вопрос!", url="https://t.me/AskTheNewTwo")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text("Что вас интересует:", reply_markup=reply_markup)
+    await update.message.reply_text("Выберите, что вас интересует:", reply_markup=reply_markup)
 
-async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
+    keyboard = []
     if query.data == "programs":
-        keyboard = [[InlineKeyboardButton("Malta", callback_data="malta")]]
-        await query.edit_message_text("Выберите страну:", reply_markup=InlineKeyboardMarkup(keyboard))
+        keyboard = [[InlineKeyboardButton("🇲🇹 Malta", callback_data="malta")]]
     elif query.data == "malta":
+        keyboard = [[InlineKeyboardButton("LSCM", callback_data="lscm")]]
+    elif query.data == "lscm":
         keyboard = [
             [InlineKeyboardButton("English", url="https://lscmalta.edu.mt/courses/academic-english/")],
             [InlineKeyboardButton("MBA", url="https://lscmalta.edu.mt/courses/master-of-business-administration/")],
             [InlineKeyboardButton("Bachelor", url="https://lscmalta.edu.mt/courses/bachelor-with-honours-in-business/")]
         ]
-        await query.edit_message_text("Выберите курс:", reply_markup=InlineKeyboardMarkup(keyboard))
-    elif query.data == "request":
-        await query.edit_message_text("Заполните форму: https://thenewtwo.netlify.app/study_request_form.html")
-    elif query.data == "question":
-        await query.edit_message_text("Задайте вопрос: https://t.me/AskTheNewTwo")
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    await query.edit_message_reply_markup(reply_markup=reply_markup)
 
 if __name__ == "__main__":
     app = ApplicationBuilder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(CallbackQueryHandler(button_handler))
+    app.add_handler(CallbackQueryHandler(button))
     app.run_polling()
